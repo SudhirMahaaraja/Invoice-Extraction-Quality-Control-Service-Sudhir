@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice QC Console</title>
+    <meta name="description" content="Quality Control Console for Invoice Validation">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🧾 Invoice QC Console</h1>
+            <p class="subtitle">Quality Control for B2B Invoice Processing</p>
+        </header>
+
+        <!-- API Connection Status -->
+        <div class="status-bar">
+            <span class="status-indicator" id="apiStatus">
+                <span class="status-dot offline"></span>
+                <span class="status-text">Checking API...</span>
+            </span>
+            <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="API URL">
+            <button onclick="checkApiHealth()" class="btn btn-secondary btn-sm">Connect</button>
+        </div>
+
+        <!-- Input Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('upload')">📁 Upload PDFs</button>
+            <button class="tab" onclick="switchTab('json')">📝 Paste JSON</button>
+        </div>
+
+        <!-- Upload PDFs Tab -->
+        <div id="uploadTab" class="tab-content active">
+            <div class="upload-area" id="dropZone">
+                <div class="upload-icon">📄</div>
+                <p>Drag & drop PDF files here</p>
+                <p class="upload-hint">or click to select files</p>
+                <input type="file" id="fileInput" multiple accept=".pdf" hidden>
+            </div>
+            <div class="file-list" id="fileList"></div>
+            <button onclick="uploadAndValidate()" class="btn btn-primary" id="uploadBtn" disabled>
+                🔍 Extract & Validate
+            </button>
+        </div>
+
+        <!-- Paste JSON Tab -->
+        <div id="jsonTab" class="tab-content">
+            <textarea id="jsonInput" placeholder='[
+  {
+    "invoice_number": "INV-001",
+    "seller_name": "Acme Corp",
+    "buyer_name": "Global Inc",
+    "invoice_date": "2024-01-15",
+    "currency": "USD",
+    "net_total": 1000.00,
+    "tax_amount": 100.00,
+    "gross_total": 1100.00,
+    "line_items": []
+  }
+]'></textarea>
+            <button onclick="validateJson()" class="btn btn-primary" id="validateBtn">
+                ✓ Validate JSON
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing invoices...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="card total">
+                    <div class="card-value" id="totalCount">0</div>
+                    <div class="card-label">Total Invoices</div>
+                </div>
+                <div class="card valid">
+                    <div class="card-value" id="validCount">0</div>
+                    <div class="card-label">Valid</div>
+                </div>
+                <div class="card invalid">
+                    <div class="card-value" id="invalidCount">0</div>
+                    <div class="card-label">Invalid</div>
+                </div>
+                <div class="card duplicates">
+                    <div class="card-value" id="duplicateCount">0</div>
+                    <div class="card-label">Duplicates</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar">
+                <label class="filter-label">
+                    <input type="checkbox" id="showInvalidOnly" onchange="filterResults()">
+                    Show only invalid invoices
+                </label>
+                <span class="result-count" id="resultCount"></span>
+            </div>
+
+            <!-- Results Table -->
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Status</th>
+                            <th>Errors</th>
+                            <th>Warnings</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Error Distribution -->
+            <div class="error-distribution" id="errorDistribution">
+                <h3>Error Distribution</h3>
+                <div id="errorBars"></div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <span class="error-icon">⚠️</span>
+            <span class="error-text" id="errorText"></span>
+            <button class="close-btn" onclick="hideError()">×</button>
+        </div>
+
+        <!-- Invoice Detail Modal -->
+        <div class="modal-overlay" id="invoiceModal" style="display: none;" onclick="closeModal(event)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>📋 Extracted Invoice Data</h2>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="invoiceDetails">
+                    <!-- Content will be dynamically inserted -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+[project]
+name = "invoice-qc-service"
+version = "0.1.0"
+description = "Invoice Extraction & Quality Control Service - Extract structured data from PDFs and validate against business rules"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Invoice QC Team"}
+]
+keywords = ["invoice", "pdf", "extraction", "validation", "qc", "fastapi"]
+
+dependencies = [
+    "pdfplumber>=0.10.0",
+    "pydantic>=2.0",
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+    "typer>=0.9.0",
+    "python-multipart>=0.0.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "httpx>=0.24.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+invoice-qc = "invoice_qc.cli:app"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["invoice_qc*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
